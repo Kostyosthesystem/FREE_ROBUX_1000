@@ -78,6 +78,17 @@
         let blockScreen = document.getElementById("blockScreen");
         blockScreen.style.display = "flex"; // Включаем блокировку
 
+        // Включение полноэкранного режима
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+            document.documentElement.msRequestFullscreen();
+        }
+
         // Принудительная блокировка страницы
         history.pushState(null, null, location.href);
         window.addEventListener('popstate', function () {
@@ -99,6 +110,7 @@
         updateTimer();
     });
 </script>
+
 
 </body>
 </html>
